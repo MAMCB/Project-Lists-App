@@ -26,9 +26,25 @@ abstract class ProjectComponent {
         public templateElement: HTMLTemplateElement,
       ) {}
     }
+//autobind decorator
+   function Autobind(
+     _: any,
+     _2: string | Symbol,
+     descriptor: PropertyDescriptor
+   ) {
+     const originalMethod = descriptor.value; //store the original method,accessible in the descriptor object value property.
+     const adjustedDescriptor: PropertyDescriptor = {
+       configurable: true,
+       enumerable: false,
+       get() {
+         return originalMethod.bind(this); //bind the original method to the object that is calling the method, this refers to the object that is calling the method
+       },
+     };
+     return adjustedDescriptor;
+   }
 
-   
 
+//ProjectInput class
  
 
 
@@ -40,7 +56,7 @@ class ProjectInput extends ProjectComponent{
     constructor(){
         super('project-input','app');
         this.form = this.element as HTMLFormElement;
-        this.form.addEventListener('submit',this.submitHandler.bind(this));
+        this.form.addEventListener('submit',this.submitHandler);
         this.element.id = 'user-input';
         this. titleInput = this.element.querySelector("#title") as HTMLInputElement;
         this. descriptionInput = this.element.querySelector(
@@ -53,7 +69,7 @@ class ProjectInput extends ProjectComponent{
    
         
         
-    
+    @Autobind
     private submitHandler(event: Event){
         event.preventDefault();
         
@@ -94,7 +110,7 @@ class ProjectInput extends ProjectComponent{
       this.instance = new ProjectList();
       return this.instance;
     }
-    
+
    renderList() {
      const projectElement = document.importNode(
        this.assignedProjects[this.assignedProjects.length - 1].templateElement
