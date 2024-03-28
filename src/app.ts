@@ -18,14 +18,7 @@ abstract class ProjectComponent {
 
     
 
-    class Project {
-      constructor(
-        public title: string,
-        public description: string,
-        public people: number,
-        public templateElement: HTMLTemplateElement,
-      ) {}
-    }
+    
 //autobind decorator
    function Autobind(
      _: any,
@@ -44,6 +37,78 @@ abstract class ProjectComponent {
    }
 
 
+//validation decorator
+
+interface ValidatorConfig {
+  [property: string]: {
+    [validatableProp: string]: string[]; //["required","positive"]
+  };
+}
+
+const registeredValidators: ValidatorConfig = {};
+
+function RequiredField(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    [propName]: [
+      ...(registeredValidators[target.constructor.name]?.[propName] ?? []),
+      "required",
+    ],
+  };
+}
+
+function PositiveNumber(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    [propName]: [
+      ...(registeredValidators[target.constructor.name]?.[propName] ?? []),
+      "positive",
+    ],
+  };
+}
+
+function validate(obj: any, className: string): boolean {
+  const objValidatorConfig = registeredValidators[className];
+  if (!objValidatorConfig) {
+    alert("No validation found for this object");
+    return true;
+  }
+  let isValid = true;
+  for (const prop in objValidatorConfig) {
+    for (const validator of objValidatorConfig[prop]) {
+      switch (validator) {
+        case "required":
+          isValid = isValid && !!obj[prop]; //the !! converts the value to a boolean
+          break;
+        case "positive":
+          isValid = isValid && obj[prop] > 0;
+          break;
+      }
+    }
+  }
+  return isValid;
+}
+//Project class
+class Project {
+  @RequiredField
+  title: string | null;
+  @RequiredField
+  description: string | null;
+  @PositiveNumber
+  people: number | null;
+  constructor(
+    title: string | null,
+    description: string | null,
+    people: number | null,
+    public templateElement: HTMLTemplateElement
+  ) {
+    this.title = title;
+    this.description = description;
+    this.people = people;
+  }
+}
+
+
 //ProjectInput class
  
 
@@ -53,6 +118,7 @@ class ProjectInput extends ProjectComponent{
     titleInput: HTMLInputElement;
     descriptionInput: HTMLInputElement;
     peopleInput: HTMLInputElement;
+  
     constructor(){
         super('project-input','app');
         this.form = this.element as HTMLFormElement;
@@ -65,6 +131,7 @@ class ProjectInput extends ProjectComponent{
         this. peopleInput = this.element.querySelector(
           "#people"
         ) as HTMLInputElement;
+        
     }
    
         
@@ -73,14 +140,20 @@ class ProjectInput extends ProjectComponent{
     private submitHandler(event: Event){
         event.preventDefault();
         
-
+        
         const title = this.titleInput.value;
-        const description = this.descriptionInput.value;
-        const people = this.peopleInput.value;
-        const newProject = new Project(title,description,+people,document.getElementById('single-project') as HTMLTemplateElement);
+       const description = this.descriptionInput.value;
+        const people = +this.peopleInput.value;
+        const newProject = new Project(title,description,people,document.getElementById('single-project') as HTMLTemplateElement);
+        if(!validate(newProject,"Project")){
+            alert('Invalid input, please try again');
+            return;
+        }
+        else{
         projectList.assignedProjects.push(newProject);
         projectList.renderList();
         this.clearInputs();
+        }
 
     }
     private clearInputs(){
