@@ -91,15 +91,15 @@ function validate(obj: any, className: string): boolean {
 //Project class
 class Project {
   @RequiredField
-  title: string | null;
+  title: string;
   @RequiredField
-  description: string | null;
+  description: string;
   @PositiveNumber
-  people: number | null;
+  people: number;
   constructor(
-    title: string | null,
-    description: string | null,
-    people: number | null,
+    title: string,
+    description: string,
+    people: number,
     public templateElement: HTMLTemplateElement
   ) {
     this.title = title;
