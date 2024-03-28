@@ -80,7 +80,13 @@ class ProjectInput extends ProjectComponent{
         const newProject = new Project(title,description,+people,document.getElementById('single-project') as HTMLTemplateElement);
         projectList.assignedProjects.push(newProject);
         projectList.renderList();
+        this.clearInputs();
 
+    }
+    private clearInputs(){
+        this.titleInput.value = '';
+        this.descriptionInput.value = '';
+        this.peopleInput.value = '';
     }
    
     
