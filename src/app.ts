@@ -34,10 +34,21 @@ abstract class ProjectComponent {
 
 class ProjectInput extends ProjectComponent{
     form: HTMLFormElement;
+    titleInput: HTMLInputElement;
+    descriptionInput: HTMLInputElement;
+    peopleInput: HTMLInputElement;
     constructor(){
         super('project-input','app');
         this.form = this.element as HTMLFormElement;
         this.form.addEventListener('submit',this.submitHandler.bind(this));
+        this.element.id = 'user-input';
+        this. titleInput = this.element.querySelector("#title") as HTMLInputElement;
+        this. descriptionInput = this.element.querySelector(
+          "#description"
+        ) as HTMLInputElement;
+        this. peopleInput = this.element.querySelector(
+          "#people"
+        ) as HTMLInputElement;
     }
    
         
@@ -45,13 +56,11 @@ class ProjectInput extends ProjectComponent{
     
     private submitHandler(event: Event){
         event.preventDefault();
-        const titleInput = document.getElementById('title') as HTMLInputElement;
-        const descriptionInput = document.getElementById('description') as HTMLInputElement;
-        const peopleInput = document.getElementById('people') as HTMLInputElement;
+        
 
-        const title = titleInput.value;
-        const description = descriptionInput.value;
-        const people = peopleInput.value;
+        const title = this.titleInput.value;
+        const description = this.descriptionInput.value;
+        const people = this.peopleInput.value;
         const newProject = new Project(title,description,+people,document.getElementById('single-project') as HTMLTemplateElement);
         projectList.assignedProjects.push(newProject);
         projectList.renderList();
