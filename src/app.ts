@@ -71,9 +71,11 @@ class ProjectInput extends ProjectComponent{
 }
 
  class ProjectList extends ProjectComponent {
+  private static instance: ProjectList;
    assignedProjects: Project[];
    ulElement: HTMLUListElement;
-   constructor() {
+
+   private constructor() {
      super("project-list", "app");
      this.assignedProjects = [];
      
@@ -83,6 +85,16 @@ class ProjectInput extends ProjectComponent{
    log() {
      console.log(this);
    }
+
+
+   public static getInstance() {
+      if (this.instance) {
+        return this.instance;
+      }
+      this.instance = new ProjectList();
+      return this.instance;
+    }
+    
    renderList() {
      const projectElement = document.importNode(
        this.assignedProjects[this.assignedProjects.length - 1].templateElement
@@ -104,7 +116,7 @@ class ProjectInput extends ProjectComponent{
 
 
 
-const projectList = new ProjectList();
+const projectList = ProjectList.getInstance();
 const projectInput = new ProjectInput();
    
 
