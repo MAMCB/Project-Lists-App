@@ -90,6 +90,9 @@ function validate(obj: any, className: string): boolean {
 }
 
 //Validation decorator version2
+const titleParameters = {required:true,minLength:5,maxLength:30};
+const descriptionParameters = {required:true,minLength:5,maxLength:300};
+const peopleParameters = {required:true,min:1,max:5};
 interface Validatable {
   value: string | number;
   required?: boolean;
@@ -127,15 +130,15 @@ function createValidator(obj: any , prop: string){
  
     if(prop === "title")
     {
-      validatableProp = {value: obj[prop],required:true,minLength:5, maxLength:10} as Validatable;
+      validatableProp = {value: obj[prop],...titleParameters} as Validatable;
     }
     if(prop === "description")
     {
-      validatableProp = {value: obj[prop],required:true,minLength:5,maxLength:30} as Validatable;
+      validatableProp = {value: obj[prop],...descriptionParameters} as Validatable;
     }
     if(prop === "people")
     {
-      validatableProp = {value: obj[prop],required:true,min:1,max:5} as Validatable;
+      validatableProp = {value: obj[prop],...peopleParameters} as Validatable;
     }
 
     
@@ -164,6 +167,11 @@ class Project {
     this.title = title;
     this.description = description;
     this.people = people;
+  }
+  @Autobind
+  showDescription() {
+    const projectDescription = ProjectDescription.getInstance();
+    projectDescription.setProject(this);
   }
 }
 
@@ -229,8 +237,8 @@ class ProjectInput extends ProjectComponent{
         //    return;
         //  }
         
-        projectList.assignedProjects.push(newProject);
-        projectList.renderList();
+        activeProjects.assignedProjects.push(newProject);
+        activeProjects.renderList();
         this.clearInputs();
         
 
@@ -246,15 +254,18 @@ class ProjectInput extends ProjectComponent{
 
 
  class ProjectList extends ProjectComponent {
-  private static instance: ProjectList;
+ 
    assignedProjects: Project[];
    ulElement: HTMLUListElement;
+  
 
-   private constructor() {
+   constructor(private type: "active" | "finished") {
      super("project-list", "app");
      this.assignedProjects = [];
+     this.element.id = `${this.type}-projects`;
      
      this.ulElement = this.element.querySelector("ul") as HTMLUListElement;
+     this.element.querySelector("h2")!.textContent = `${this.type.toUpperCase()} PROJECTS`;
      this.log();
    }
    log() {
@@ -262,13 +273,7 @@ class ProjectInput extends ProjectComponent{
    }
 
 
-   public static getInstance() {
-      if (this.instance) {
-        return this.instance;
-      }
-      this.instance = new ProjectList();
-      return this.instance;
-    }
+   
 
    renderList() {
      const projectElement = document.importNode(
@@ -282,7 +287,40 @@ class ProjectInput extends ProjectComponent{
         ].title;
 
      this.ulElement.appendChild(listLElement);
+     listLElement.addEventListener(
+       "click",
+       this.assignedProjects[this.assignedProjects.length - 1].showDescription
+     );
    }
+ }
+
+ class ProjectDescription extends ProjectComponent {
+  private static instance: ProjectDescription;
+private project: Project;
+ titleElement: HTMLHeadingElement;
+ numPeopleElement: HTMLHeadingElement;
+  descriptionElement: HTMLParagraphElement;
+   private constructor() {
+     super("project-item", "app");
+     this.project = activeProjects.assignedProjects[0];
+     this.titleElement = this.element.querySelector("h2") as HTMLHeadingElement;
+      this.numPeopleElement = this.element.querySelector("h3") as HTMLHeadingElement;
+      this.descriptionElement = this.element.querySelector("p") as HTMLParagraphElement;
+   }
+
+   public setProject(project: Project) {
+      this.project = project;
+      this.titleElement.textContent = this.project.title;
+      this.numPeopleElement.textContent = this.project.people.toString();
+      this.descriptionElement.textContent = this.project.description;
+   }
+    public static getInstance() {
+      if (this.instance) {
+        return this.instance;
+      }
+      this.instance = new ProjectDescription();
+      return this.instance;
+    }
  }
 
 
@@ -290,8 +328,8 @@ class ProjectInput extends ProjectComponent{
 
 
 
-
-const projectList = ProjectList.getInstance();
+const finishedProjects = new ProjectList("finished");
+const activeProjects = new ProjectList("active");
 const projectInput = new ProjectInput();
    
 
