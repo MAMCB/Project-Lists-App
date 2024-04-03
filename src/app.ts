@@ -203,6 +203,8 @@ class ProjectInput extends ProjectComponent{
         const title = this.titleInput.value;
        const description = this.descriptionInput.value;
         const people = +this.peopleInput.value;
+
+        //using the validation decorator version2
        for(let i=0; i<validators.length; i++){
         if(i === 0){
           validators[i].value = title;
@@ -222,6 +224,10 @@ class ProjectInput extends ProjectComponent{
           }
         }
         const newProject = new Project(title,description,people,document.getElementById('single-project') as HTMLTemplateElement);
+        //  if (!validate(newProject, "Project")) {
+        //    alert("Invalid input, please try again");
+        //    return;
+        //  }
         
         projectList.assignedProjects.push(newProject);
         projectList.renderList();
