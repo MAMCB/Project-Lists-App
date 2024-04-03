@@ -37,7 +37,7 @@ abstract class ProjectComponent {
    }
 
 
-//validation decorator
+//validation decorator version1
 
 interface ValidatorConfig {
   [property: string]: {
@@ -88,13 +88,72 @@ function validate(obj: any, className: string): boolean {
   }
   return isValid;
 }
+
+//Validation decorator version2
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+function validate2(obj: Validatable){
+  let isValid = true;
+  if(obj.required){
+    isValid = isValid && obj.value.toString().trim().length !== 0;
+  }
+  if(obj.minLength != null && typeof obj.value === 'string'){
+    isValid = isValid && obj.value.length >= obj.minLength;
+  }
+  if(obj.maxLength != null && typeof obj.value === 'string'){
+    isValid = isValid && obj.value.length <= obj.maxLength;
+  }
+  if(obj.min != null && typeof obj.value === 'number'){
+    isValid = isValid && obj.value >= obj.min;
+  }
+  if(obj.max != null && typeof obj.value === 'number'){
+    isValid = isValid && obj.value <= obj.max;
+  } 
+  return isValid;
+}
+
+const validators: Validatable[] = [];
+
+function createValidator(obj: any , prop: string){
+  
+  let validatableProp : Validatable = {value:'',required:false};
+ 
+    if(prop === "title")
+    {
+      validatableProp = {value: obj[prop],required:true,minLength:5, maxLength:10} as Validatable;
+    }
+    if(prop === "description")
+    {
+      validatableProp = {value: obj[prop],required:true,minLength:5,maxLength:30} as Validatable;
+    }
+    if(prop === "people")
+    {
+      validatableProp = {value: obj[prop],required:true,min:1,max:5} as Validatable;
+    }
+
+    
+  
+  validators.push(validatableProp);
+  
+}
+
 //Project class
 class Project {
-  @RequiredField
+  // @RequiredField
+  @createValidator
   title: string;
-  @RequiredField
+  // @RequiredField
+  @createValidator
   description: string;
-  @PositiveNumber
+  // @PositiveNumber
+  @createValidator
   people: number;
   constructor(
     title: string,
@@ -144,16 +203,36 @@ class ProjectInput extends ProjectComponent{
         const title = this.titleInput.value;
        const description = this.descriptionInput.value;
         const people = +this.peopleInput.value;
-        const newProject = new Project(title,description,people,document.getElementById('single-project') as HTMLTemplateElement);
-        if(!validate(newProject,"Project")){
-            alert('Invalid input, please try again');
-            return;
+
+        //using the validation decorator version2
+       for(let i=0; i<validators.length; i++){
+        if(i === 0){
+          validators[i].value = title;
+          
         }
-        else{
+        if(i === 1){
+          validators[i].value = description;
+        }
+        if(i === 2){
+          validators[i].value = people;
+        }
+       }
+       for(let validator of validators){
+          if(!validate2(validator)){
+            alert("Invalid input, please try again");
+            return;
+          }
+        }
+        const newProject = new Project(title,description,people,document.getElementById('single-project') as HTMLTemplateElement);
+        //  if (!validate(newProject, "Project")) {
+        //    alert("Invalid input, please try again");
+        //    return;
+        //  }
+        
         projectList.assignedProjects.push(newProject);
         projectList.renderList();
         this.clearInputs();
-        }
+        
 
     }
     private clearInputs(){
@@ -164,6 +243,7 @@ class ProjectInput extends ProjectComponent{
    
     
 }
+
 
  class ProjectList extends ProjectComponent {
   private static instance: ProjectList;
