@@ -15,9 +15,42 @@ abstract class ProjectComponent {
     
     }
 
+//Project state management
 
+class ProjectManagementState {
+  private static instance: ProjectManagementState;
+  private projects: Project[] = [];
+  private listeners: any[] = [];
+  private constructor() {}
+  public static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectManagementState();
+    return this.instance;
+  }
+  addProject(project: Project) {
+    this.projects.push(project);
+    this.notifyListeners();
+  }
+
+  public addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+  private notifyListeners() {
+    for (const listener of this.listeners) {
+      listener(this.projects[this.projects.length - 1]);
+    }
+  }
+
+}
+
+const projectState = ProjectManagementState.getInstance();
     
-
+enum ProjectStatus {
+  active,
+  finished,
+}
     
 //autobind decorator
    function Autobind(
@@ -92,7 +125,7 @@ function validate(obj: any, className: string): boolean {
 //Validation decorator version2
 const titleParameters = {required:true,minLength:5,maxLength:30};
 const descriptionParameters = {required:true,minLength:5,maxLength:300};
-const peopleParameters = {required:true,min:1,max:5};
+const peopleParameters = {required:true,min:1,max:10};
 interface Validatable {
   value: string | number;
   required?: boolean;
@@ -158,6 +191,10 @@ class Project {
   // @PositiveNumber
   @createValidator
   people: number;
+
+  id:string;
+
+  status: ProjectStatus = ProjectStatus.active;
   constructor(
     title: string,
     description: string,
@@ -167,6 +204,7 @@ class Project {
     this.title = title;
     this.description = description;
     this.people = people;
+    this.id = Math.random().toString();
   }
   @Autobind
   showDescription() {
@@ -237,8 +275,9 @@ class ProjectInput extends ProjectComponent{
         //    return;
         //  }
         
-        activeProjects.assignedProjects.push(newProject);
-        activeProjects.renderList();
+       // activeProjects.assignedProjects.push(newProject);
+        //activeProjects.renderList();
+        projectState.addProject(newProject);
         this.clearInputs();
         
 
@@ -259,23 +298,30 @@ class ProjectInput extends ProjectComponent{
    ulElement: HTMLUListElement;
   
 
-   constructor(private type: "active" | "finished") {
+   constructor(private type: ProjectStatus) {
      super("project-list", "app");
      this.assignedProjects = [];
-     this.element.id = `${this.type}-projects`;
+     this.element.id = `${ProjectStatus[this.type]}-projects`;
      
      this.ulElement = this.element.querySelector("ul") as HTMLUListElement;
-     this.element.querySelector("h2")!.textContent = `${this.type.toUpperCase()} PROJECTS`;
-     this.log();
+     this.element.querySelector("h2")!.textContent = `${ProjectStatus[this.type].toUpperCase()} PROJECTS`;
+      projectState.addListener(this.addProject);
    }
    log() {
      console.log(this);
    }
+   @Autobind
+   addProject(project: Project) {
+    if (project.status === this.type) {
+      this.assignedProjects.push(project);
+      this.renderList();
+    }
+    }
 
 
    
 
-   renderList() {
+  private renderList() {
      const projectElement = document.importNode(
        this.assignedProjects[this.assignedProjects.length - 1].templateElement
          .content,
@@ -328,8 +374,8 @@ private project: Project;
 
 
 
-const finishedProjects = new ProjectList("finished");
-const activeProjects = new ProjectList("active");
+const finishedProjects = new ProjectList(1);
+const activeProjects = new ProjectList(0);
 const projectInput = new ProjectInput();
    
 
