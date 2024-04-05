@@ -17,10 +17,12 @@ abstract class ProjectComponent {
 
 //Project state management
 
+type Listener = (items: Project) => void;
+
 class ProjectManagementState {
   private static instance: ProjectManagementState;
   private projects: Project[] = [];
-  private listeners: any[] = [];
+  private listeners: Listener[] = [];
   private constructor() {}
   public static getInstance() {
     if (this.instance) {
@@ -34,7 +36,7 @@ class ProjectManagementState {
     this.notifyListeners();
   }
 
-  public addListener(listenerFn: Function) {
+  public addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
   private notifyListeners() {
