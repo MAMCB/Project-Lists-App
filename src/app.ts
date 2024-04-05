@@ -19,13 +19,23 @@ abstract class ProjectComponent <T extends HTMLElement, U extends HTMLElement> {
 
 //Project state management
 
-type Listener = (items: Project) => void;
+abstract class State <T> {
+  protected listeners: Listener<T>[] = [];
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+  abstract notifyListeners(): void;
+}
 
-class ProjectManagementState {
+type Listener<T> = (items: T) => void;
+
+class ProjectManagementState extends State <Project>{
   private static instance: ProjectManagementState;
   private projects: Project[] = [];
-  private listeners: Listener[] = [];
-  private constructor() {}
+ 
+  private constructor() {
+    super();
+  }
   public static getInstance() {
     if (this.instance) {
       return this.instance;
@@ -38,10 +48,8 @@ class ProjectManagementState {
     this.notifyListeners();
   }
 
-  public addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
-  }
-  private notifyListeners() {
+ 
+   notifyListeners() {
     for (const listener of this.listeners) {
       listener(this.projects[this.projects.length - 1]);
     }
