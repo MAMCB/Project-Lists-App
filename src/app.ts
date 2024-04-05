@@ -1,16 +1,18 @@
-abstract class ProjectComponent {
+abstract class ProjectComponent <T extends HTMLElement, U extends HTMLElement> {
     templateElement: HTMLTemplateElement;
-    hostElement: HTMLDivElement;
-    element: HTMLElement;
-    constructor(templateId: string, hostElementId: string) {
+    hostElement: T;
+    element: U;
+    insertAtStart: boolean;
+    constructor(templateId: string, hostElementId: string, insertAtStart: boolean ) {
         this.templateElement = document.getElementById(templateId)! as HTMLTemplateElement;
-        this.hostElement = document.getElementById(hostElementId)! as HTMLDivElement;
+        this.hostElement = document.getElementById(hostElementId)! as T;
          const importedNode = document.importNode(
            this.templateElement.content,
            true
          );
-         this.element = importedNode.firstElementChild as HTMLElement;
-         this.hostElement.insertAdjacentElement("afterbegin", this.element);
+         this.element = importedNode.firstElementChild as U;
+          this.insertAtStart = insertAtStart;
+         this.hostElement.insertAdjacentElement(insertAtStart?"afterbegin":"beforeend", this.element);
     }
     
     }
@@ -220,16 +222,16 @@ class Project {
  
 
 
-class ProjectInput extends ProjectComponent{
-    form: HTMLFormElement;
+class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
+   
     titleInput: HTMLInputElement;
     descriptionInput: HTMLInputElement;
     peopleInput: HTMLInputElement;
   
     constructor(){
-        super('project-input','app');
-        this.form = this.element as HTMLFormElement;
-        this.form.addEventListener('submit',this.submitHandler);
+        super('project-input','app',true);
+       
+        this.element.addEventListener('submit',this.submitHandler);
         this.element.id = 'user-input';
         this. titleInput = this.element.querySelector("#title") as HTMLInputElement;
         this. descriptionInput = this.element.querySelector(
@@ -294,14 +296,14 @@ class ProjectInput extends ProjectComponent{
 }
 
 
- class ProjectList extends ProjectComponent {
+ class ProjectList extends ProjectComponent <HTMLDivElement,HTMLElement> {
  
    assignedProjects: Project[];
    ulElement: HTMLUListElement;
   
 
    constructor(private type: ProjectStatus) {
-     super("project-list", "app");
+     super("project-list", "app",true);
      this.assignedProjects = [];
      this.element.id = `${ProjectStatus[this.type]}-projects`;
      
@@ -342,14 +344,14 @@ class ProjectInput extends ProjectComponent{
    }
  }
 
- class ProjectDescription extends ProjectComponent {
+ class ProjectDescription extends ProjectComponent <HTMLDivElement,HTMLElement>{
   private static instance: ProjectDescription;
 private project: Project;
  titleElement: HTMLHeadingElement;
  numPeopleElement: HTMLHeadingElement;
   descriptionElement: HTMLParagraphElement;
    private constructor() {
-     super("project-item", "app");
+     super("project-item", "app",false);
      this.project = activeProjects.assignedProjects[0];
      this.titleElement = this.element.querySelector("h2") as HTMLHeadingElement;
       this.numPeopleElement = this.element.querySelector("h3") as HTMLHeadingElement;
