@@ -211,20 +211,44 @@ class Project {
     title: string,
     description: string,
     people: number,
-    public templateElement: HTMLTemplateElement
+   
   ) {
+   
     this.title = title;
     this.description = description;
     this.people = people;
     this.id = Math.random().toString();
   }
-  @Autobind
-  showDescription() {
-    const projectDescription = ProjectDescription.getInstance();
-    projectDescription.setProject(this);
-  }
+
 }
 
+//ProjectItem class
+class ProjectItem extends ProjectComponent<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+  titleElement: HTMLHeadingElement;
+  numPeopleElement: HTMLHeadingElement;
+  descriptionElement: HTMLParagraphElement;
+  constructor(hostId: string, project: Project) {
+    super("single-project", hostId, false);
+    this.project = project;
+    this.titleElement = this.element.querySelector("h2") as HTMLHeadingElement;
+    this.numPeopleElement = this.element.querySelector(
+      "h3"
+    ) as HTMLHeadingElement;
+    this.descriptionElement = this.element.querySelector(
+      "p"
+    ) as HTMLParagraphElement;
+    this.titleElement.textContent = this.project.title;
+    this.numPeopleElement.textContent = this.project.people.toString();
+    this.descriptionElement.textContent = this.project.description;
+
+    
+  }
+
+  public getProject() {
+    return this.project;
+  }
+}
 
 //ProjectInput class
  
@@ -281,7 +305,7 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
             return;
           }
         }
-        const newProject = new Project(title,description,people,document.getElementById('single-project') as HTMLTemplateElement);
+        const newProject = new Project(title,description,people);
         //  if (!validate(newProject, "Project")) {
         //    alert("Invalid input, please try again");
         //    return;
@@ -306,7 +330,7 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
 
  class ProjectList extends ProjectComponent <HTMLDivElement,HTMLElement> {
  
-   assignedProjects: Project[];
+   assignedProjects: ProjectItem[];
    ulElement: HTMLUListElement;
   
 
@@ -325,61 +349,22 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
    @Autobind
    addProject(project: Project) {
     if (project.status === this.type) {
-      this.assignedProjects.push(project);
-      this.renderList();
+      const projectElement = new ProjectItem(
+        this.element.id,
+        project
+      );
+      this.assignedProjects.push(projectElement);
+      
     }
     }
 
 
    
 
-  private renderList() {
-     const projectElement = document.importNode(
-       this.assignedProjects[this.assignedProjects.length - 1].templateElement
-         .content,
-       true
-     );
-     const listLElement = projectElement.firstElementChild as HTMLLIElement;
-        listLElement.textContent = this.assignedProjects[
-        this.assignedProjects.length - 1
-        ].title;
-
-     this.ulElement.appendChild(listLElement);
-     listLElement.addEventListener(
-       "click",
-       this.assignedProjects[this.assignedProjects.length - 1].showDescription
-     );
-   }
+ 
  }
 
- class ProjectDescription extends ProjectComponent <HTMLDivElement,HTMLElement>{
-  private static instance: ProjectDescription;
-private project: Project;
- titleElement: HTMLHeadingElement;
- numPeopleElement: HTMLHeadingElement;
-  descriptionElement: HTMLParagraphElement;
-   private constructor() {
-     super("project-item", "app",false);
-     this.project = activeProjects.assignedProjects[0];
-     this.titleElement = this.element.querySelector("h2") as HTMLHeadingElement;
-      this.numPeopleElement = this.element.querySelector("h3") as HTMLHeadingElement;
-      this.descriptionElement = this.element.querySelector("p") as HTMLParagraphElement;
-   }
-
-   public setProject(project: Project) {
-      this.project = project;
-      this.titleElement.textContent = this.project.title;
-      this.numPeopleElement.textContent = this.project.people.toString();
-      this.descriptionElement.textContent = this.project.description;
-   }
-    public static getInstance() {
-      if (this.instance) {
-        return this.instance;
-      }
-      this.instance = new ProjectDescription();
-      return this.instance;
-    }
- }
+ 
 
 
 
