@@ -228,6 +228,12 @@ class ProjectItem extends ProjectComponent<HTMLUListElement, HTMLLIElement> {
   titleElement: HTMLHeadingElement;
   numPeopleElement: HTMLHeadingElement;
   descriptionElement: HTMLParagraphElement;
+  get persons() {
+    if (this.project.people === 1) {
+      return "1 person";
+    }
+    return this.project.people + " people";
+  }
   constructor(hostId: string, project: Project) {
     super("single-project", hostId, false);
     this.project = project;
@@ -239,15 +245,13 @@ class ProjectItem extends ProjectComponent<HTMLUListElement, HTMLLIElement> {
       "p"
     ) as HTMLParagraphElement;
     this.titleElement.textContent = this.project.title;
-    this.numPeopleElement.textContent = this.project.people.toString();
+    this.numPeopleElement.textContent =  this.persons + " assigned";
     this.descriptionElement.textContent = this.project.description;
 
     
   }
 
-  public getProject() {
-    return this.project;
-  }
+ 
 }
 
 //ProjectInput class
@@ -337,9 +341,10 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
    constructor(private type: ProjectStatus) {
      super("project-list", "app",true);
      this.assignedProjects = [];
-     this.element.id = `${ProjectStatus[this.type]}-projects`;
+    // this.element.id = `${ProjectStatus[this.type]}-projects`;
      
      this.ulElement = this.element.querySelector("ul") as HTMLUListElement;
+     this.ulElement.id = `${ProjectStatus[this.type]}-projects-list`;
      this.element.querySelector("h2")!.textContent = `${ProjectStatus[this.type].toUpperCase()} PROJECTS`;
       projectState.addListener(this.addProject);
    }
@@ -350,7 +355,7 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
    addProject(project: Project) {
     if (project.status === this.type) {
       const projectElement = new ProjectItem(
-        this.element.id,
+        this.ulElement.id,
         project
       );
       this.assignedProjects.push(projectElement);
