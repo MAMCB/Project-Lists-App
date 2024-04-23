@@ -1,4 +1,4 @@
-namespace App{
+
     //validation decorator version1
 
 interface ValidatorConfig {
@@ -49,5 +49,4 @@ export function validate(obj: any, className: string): boolean {
     }
   }
   return isValid;
-}
 }

@@ -1,8 +1,11 @@
-/// <reference path="autobind-decorator.ts"/>
-/// <reference path="project-component.ts"/>
-/// <reference path="project-state-management.ts"/>
-
-namespace App {
+import { ProjectComponent } from "./project-component.js";
+import { ProjectItem } from "./project-item.js";
+import { ProjectStatus } from "../models/project-model.js";
+import { projectState } from "../state/project-state-management.js";
+import { DragTarget } from "../models/drag-drop-interfaces.js";
+import { Project } from "../models/project-model.js";
+import { Autobind } from "../decorators/autobind-decorator.js";
+  
   export class ProjectList
     extends ProjectComponent<HTMLDivElement, HTMLElement>
     implements DragTarget
@@ -75,4 +78,4 @@ namespace App {
       console.log(event);
     }
   }
-}
+

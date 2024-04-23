@@ -1,7 +1,8 @@
-/// <reference path="autobind-decorator.ts"/>
-/// <reference path="project-component.ts"/>
-/// <reference path="project-state-management.ts"/>
-namespace App {
+import { ProjectComponent } from "./project-component.js";
+import { Autobind } from "../decorators/autobind-decorator.js";
+import { Project } from "../models/project-model.js";
+import { projectState } from "../state/project-state-management.js";
+import { validate2, validators } from "../decorators/validation-decorators-v2.js";
   //ProjectInput class
 
  export class ProjectInput extends ProjectComponent<HTMLDivElement, HTMLFormElement> {
@@ -68,4 +69,4 @@ namespace App {
       this.peopleInput.value = "";
     }
   }
-}
+

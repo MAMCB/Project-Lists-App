@@ -1,4 +1,4 @@
-namespace App {
+
   //Validation decorator version2
   const titleParameters = { required: true, minLength: 5, maxLength: 30 };
   const descriptionParameters = {
@@ -59,4 +59,3 @@ namespace App {
 
     validators.push(validatableProp);
   }
-}

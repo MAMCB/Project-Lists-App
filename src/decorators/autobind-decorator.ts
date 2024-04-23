@@ -1,4 +1,4 @@
-namespace App {
+
   //autobind decorator
  export function Autobind(
     _: any,
@@ -15,4 +15,3 @@ namespace App {
     };
     return adjustedDescriptor;
   }
-}

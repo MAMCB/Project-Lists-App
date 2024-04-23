@@ -1,6 +1,4 @@
-/// <reference path="validation-decorators-v2.ts"/>
-
-namespace App {
+import { Project, ProjectStatus } from "../models/project-model.js";
   //Project state management
 
   abstract class State<T> {
@@ -12,32 +10,7 @@ namespace App {
   }
 
   type Listener<T> = (items: T[]) => void;
-  export enum ProjectStatus {
-    active,
-    finished,
-  }
-  //Project class
-  export class Project {
-    // @RequiredField
-    @createValidator
-    title: string;
-    // @RequiredField
-    @createValidator
-    description: string;
-    // @PositiveNumber
-    @createValidator
-    people: number;
-
-    id: string;
-
-    status: ProjectStatus = ProjectStatus.active;
-    constructor(title: string, description: string, people: number) {
-      this.title = title;
-      this.description = description;
-      this.people = people;
-      this.id = Math.random().toString();
-    }
-  }
+ 
 
   export class ProjectManagementState extends State<Project> {
     private static instance: ProjectManagementState;
@@ -73,4 +46,3 @@ namespace App {
   }
 
   export const projectState = ProjectManagementState.getInstance();
-}

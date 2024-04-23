@@ -1,4 +1,4 @@
-namespace App {
+
   export  abstract class ProjectComponent<
       T extends HTMLElement,
       U extends HTMLElement
@@ -28,4 +28,3 @@ namespace App {
         );
       }
     }
-}
