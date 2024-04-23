@@ -56,6 +56,7 @@ button:active {
 }
 
 .projects {
+  width: 50%;
   margin: 1rem;
   border: 1px solid #ff0062;
 }
@@ -82,6 +83,7 @@ button:active {
 }
 
 .projects ul {
+   padding:2rem;
   list-style: none;
   margin: 0;
   padding: 1rem;
@@ -125,4 +127,10 @@ button:active {
   padding: 1rem;
   border: 1px solid #ff0062;
   background: #f7f7f7;
+}
+
+#projects{
+  display: flex;
+  
+  justify-content: center;
 }

@@ -379,7 +379,7 @@ class ProjectInput extends ProjectComponent <HTMLDivElement,HTMLFormElement>{
    ulElement: HTMLUListElement;
 
    constructor(private type: ProjectStatus) {
-     super("project-list", "app", true);
+     super("project-list", "projects", true);
      this.assignedProjects = [];
      // this.element.id = `${ProjectStatus[this.type]}-projects`;
      this.element.id = `${ProjectStatus[this.type]}-projects`;
