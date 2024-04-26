@@ -1,4 +1,4 @@
-import { createValidator } from "../decorators/validation-decorators-v2.js";
+import { createValidator } from "../decorators/validation-decorators-v2";
 
 export enum ProjectStatus {
   active,
